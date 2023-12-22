@@ -46,6 +46,18 @@ class Voo:
     
     def get_tripulacao(self):
         return self.__tripulacao
+    
+    def get_tipoVoo(self):
+        return self.__tipoVoo
+    
+    def get_data(self):
+        return self.__data
+    
+    def get_partida(self):
+        return self.__partida
+
+    def get_destino(self):
+        return self.__destino
 
     def __str__(self):
         return f"Voo: {self.__codigoVoo}\nTipo: {self.__tipoVoo}\nData: {self.__data}\nPartida: {self.__partida}\nDestino: {self.__destino}\nAvião: {self.__aviao}\nAssentos Totais: {self.__assentosTotais}\nAssentos Livres: {self.assentosLivres()}"        
@@ -150,26 +162,6 @@ class Passageiro:
         self.nome = nome
         self.__cpf = cpf
         self.__reservas = reservas if reservas != None else []
-
-    def fazerReserva(self, passageiro, voo):
-        if voo.assentosLivres() > 0:
-            id = uuid.uuid4()
-            reserva = Reserva(passageiro, voo, id)
-            voo.reservas.append(reserva)
-            passageiro.__reservas.append(reserva)
-            return f"Reserva feita com sucesso para o voo {reserva.get_voo()}."
-        else:
-            return "Não há assentos livres para este voo."
-
-    def cancelarReserva(self, id):
-        if len(self.__reservas) > 0:
-            for i in range(len(self.__reservas)):
-                if self.__reservas[i].get_id() == id:
-                    self.__reservas.pop(i)
-                    return f"Reserva para o voo {self.__reservas[i].get_voo()} cancelada com sucesso."
-            return "Reserva não encontrada."
-        else:
-            return "Não há reservas para cancelar."
     
     def get_reservas(self):
         return self.__reservas
@@ -185,6 +177,7 @@ class OrganizadorCSV:
     def __init__(self):
         self.arquivo_passageiros = "passageiros.csv"
         self.arquivo_reservas = "reservas.csv"
+        self.arquivo_voos = "voos.csv"
 
     def proximo_id(self):
         """Retorna o próximo ID de reserva e incrementa o contador."""
@@ -279,6 +272,54 @@ class OrganizadorCSV:
             writer.writeheader()
             writer.writerows(passageiros)
 
+    def salvarVoo(self, voo):
+        """Salva informações do voo em um arquivo CSV."""
+        with open(self.arquivo_voos, mode='a', newline='', encoding='utf-8') as file:
+            cabecalhos = ['codigo', 'tipo', 'data', 'partida', 'destino', 'aviao', 'assentosTotais']
+            escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
+
+            if file.tell() == 0:
+                escrever_csv.writeheader()
+
+            escrever_csv.writerow({
+                'codigo': voo.get_codigoVoo(),
+                'tipo': voo.get_tipoVoo(),
+                'data': voo.get_data(),
+                'partida': voo.get_partida(),
+                'destino': voo.get_destino(),
+                'aviao': voo.get_aviao(),
+                'assentosTotais': voo.get_assentos()
+            })
+    
+    def carregarVoos(self):
+        """Carrega informações de voos do arquivo CSV."""
+        voos = []
+        try:
+            with open(self.arquivo_voos, mode='r') as file:
+                ler_csv = csv.DictReader(file)
+                for coluna in ler_csv:
+                    voos.append({
+                        'codigo': coluna['codigo'],
+                        'tipo': coluna['tipo'],
+                        'data': coluna['data'],
+                        'partida': coluna['partida'],
+                        'destino': coluna['destino'],
+                        'aviao': coluna['aviao'],
+                        'assentosTotais': coluna['assentosTotais']
+                    })
+        except FileNotFoundError:
+            pass
+        return voos
+    
+    def obterVooPorCodigo(self, codigo):
+        """Carrega informações de um voo específico do arquivo CSV."""
+        voos = self.carregarVoos()
+        for voo in voos:
+            if voo['codigo'] == codigo:
+                return voo
+        return None
+
+
 class Menu:
     def __init__(self, organizador):
         self.organizador = organizador
@@ -291,7 +332,9 @@ class Menu:
             print("4. Visualizar Reservas")
             print("5. Remover Reserva")
             print("6. Remover Passageiro")
-            print("7. Sair")
+            print("7. Salvar Voo")
+            print("8. Listar Voos")
+            print("9. Sair")
 
             escolha = input("Escolha uma opção: ")
 
@@ -308,6 +351,10 @@ class Menu:
             elif escolha == '6':
                 self.remover_passageiro()
             elif escolha == '7':
+                self.salvar_voo()
+            elif escolha == '8':
+                self.listar_voos()
+            elif escolha == '9':
                 break
             else:
                 print("Opção inválida. Tente novamente.")
@@ -342,20 +389,31 @@ class Menu:
         else:
             print(f"Passageiro com CPF {cpf} não encontrado.")
 
-
     def cadastrar_reserva(self):
         cpf = input("Digite o CPF do passageiro: ")
+
+        self.listar_voos()
+
         voo_codigo = input("Digite o código do voo: ")
+        voo_info = self.organizador.obterVooPorCodigo(voo_codigo)
 
         passageiros = self.organizador.carregarPassageiros()
-        if any(passageiro['cpf'] == cpf for passageiro in passageiros):
-            voo = None  # Substitua isso com a lógica para obter o objeto Voo adequado
-            if voo:
-                reserva = Reserva(passageiros[cpf], voo)
-                self.organizador.salvarReservaPassageiro(reserva)
-                print(f"Reserva para o voo {voo_codigo} cadastrada com sucesso.")
-            else:
-                print(f"Voo {voo_codigo} não encontrado.")
+
+        # Procura o passageiro na lista
+        passageiro_encontrado = None
+        for passageiro in passageiros:
+            if passageiro['cpf'] == cpf:
+                passageiro_encontrado = passageiro
+                break
+
+        if passageiro_encontrado and voo_info:
+            voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
+
+            reserva = Reserva(passageiro_encontrado, voo)
+            self.organizador.salvarReservaPassageiro(reserva)
+            print(f"Reserva para o voo {voo_codigo} cadastrada com sucesso.")
+        elif not voo_info:
+            print(f"Voo {voo_codigo} não encontrado.")
         else:
             print(f"Passageiro com CPF {cpf} não encontrado.")
 
@@ -374,6 +432,28 @@ class Menu:
             print(f"Reserva com ID {id_reserva} removida com sucesso.")
         else:
             print(f"Reserva com ID {id_reserva} não encontrada.")
+
+    def salvar_voo(self):
+        codigo = input("Digite o código do voo: ")
+        tipo = input("Digite o tipo do voo: ")
+        data = input("Digite a data do voo: ")
+        partida = input("Digite o aeroporto de partida: ")
+        destino = input("Digite o aeroporto de destino: ")
+        aviao = input("Digite o avião: ")
+        assentos = input("Digite o número de assentos: ")
+
+        voo = Voo(codigo, tipo, data, partida, destino, aviao, assentos)
+        self.organizador.salvarVoo(voo)
+        print(f"Voo {codigo} cadastrado com sucesso.")
+
+    def listar_voos(self):
+        voos = self.organizador.carregarVoos()
+        if voos:
+            print("\nVoos:")
+            for voo in voos:
+                print(f"Código: {voo['codigo']}, Tipo: {voo['tipo']}, Data: {voo['data']}, Partida: {voo['partida']}, Destino: {voo['destino']}, Avião: {voo['aviao']}, Assentos: {voo['assentosTotais']}")
+        else:
+            print("Nenhum voo cadastrado.")
 
 # Exemplo de uso:
 organizador = OrganizadorCSV()
