@@ -221,7 +221,7 @@ class OrganizadorCSV:
                 escrever_csv.writeheader()
 
             escrever_csv.writerow({
-                'cpf': reserva.get_passageiro().get_cpf(),
+                'cpf': reserva.get_passageiro()['cpf'], # agora pega o cpf pela chave nao pelo metodo
                 'voo': reserva.get_voo(),
                 'id': self.proximo_id()  # usa o id atual e incrementa o contador
             })
@@ -399,12 +399,8 @@ class Menu:
 
         passageiros = self.organizador.carregarPassageiros()
 
-        # Procura o passageiro na lista
-        passageiro_encontrado = None
-        for passageiro in passageiros:
-            if passageiro['cpf'] == cpf:
-                passageiro_encontrado = passageiro
-                break
+        # procura o passageiro na lista
+        passageiro_encontrado = next((passageiro for passageiro in passageiros if passageiro['cpf'] == cpf), None)
 
         if passageiro_encontrado and voo_info:
             voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
