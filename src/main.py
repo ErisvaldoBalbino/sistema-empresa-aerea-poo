@@ -146,9 +146,30 @@ class Reserva:
     
     def get_voo(self):
         return self.__voo.get_codigoVoo()
+    
+class Pessoa:
+    """Classe que representa uma pessoa.
+    Atributos:
+        nome (str): nome da pessoa
+        cpf (str): CPF da pessoa
+        idade (int): idade da pessoa
+        telefone (str): telefone da pessoa
+        
+    Métodos:
+        str: retorna uma string com os atributos da pessoa"""
+    def __init__(self, nome, cpf, telefone):
+        self.nome = nome
+        self.__cpf = cpf
+        self.telefone = telefone
 
-class Passageiro:
-    """Classe que representa um passageiro.
+    def get_cpf(self):
+        return self.__cpf
+    
+    def __str__(self):
+        return f"Nome: {self.nome}\nCPF: {self.__cpf}\nIdade: {self.idade}\nTelefone: {self.telefone}"
+
+class Passageiro(Pessoa):
+    """Classe que representa um passageiro. Herda de Pessoa.
     Atributos:
         nome (str): nome do passageiro
         cpf (str): CPF do passageiro
@@ -158,17 +179,13 @@ class Passageiro:
         fazerReserva: faz uma reserva para o passageiro em um voo
         cancelarReserva: cancela uma reserva do passageiro em um voo
         visualizarReservas: retorna o número de reservas do passageiro"""
-    def __init__(self, nome, cpf, reservas = None):
-        self.nome = nome
-        self.__cpf = cpf
+    def __init__(self, nome, cpf, telefone, reservas = None):
+        super().__init__(nome, cpf, telefone)
         self.__reservas = reservas if reservas != None else []
     
     def get_reservas(self):
         return self.__reservas
     
-    def get_cpf(self):
-        return self.__cpf
-
 import csv
 
 class OrganizadorCSV:
@@ -188,13 +205,13 @@ class OrganizadorCSV:
     def salvarPassageiro(self, passageiro):
         """Salva informações do passageiro em um arquivo CSV."""
         with open(self.arquivo_passageiros, mode='a', newline='', encoding='utf-8') as file:
-            cabecalhos = ['nome', 'cpf']
+            cabecalhos = ['nome', 'cpf', 'telefone']
             escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
 
             if file.tell() == 0:  # escreve o cabeçalho se o arquivo estiver vazio
                 escrever_csv.writeheader()
 
-            escrever_csv.writerow({'nome': passageiro.nome, 'cpf': passageiro.get_cpf()})
+            escrever_csv.writerow({'nome': passageiro.nome, 'cpf': passageiro.get_cpf(), 'telefone': passageiro.telefone})
 
     def carregarPassageiros(self):
         """Carrega informações de passageiros do arquivo CSV."""
@@ -205,7 +222,8 @@ class OrganizadorCSV:
                 for coluna in ler_csv:
                     passageiros.append({
                         'nome': coluna['nome'],
-                        'cpf': coluna['cpf']
+                        'cpf': coluna['cpf'],
+                        'telefone': coluna['telefone']
                     })
         except FileNotFoundError:
             pass
@@ -245,17 +263,22 @@ class OrganizadorCSV:
     def removerReserva(self, id):
         """Remove uma reserva com base no ID do arquivo CSV."""
         reservas = []
+        removida = False
         with open(self.arquivo_reservas, mode='r') as file:
             ler_csv = csv.DictReader(file)
             cabecalhos = ler_csv.fieldnames
             for coluna in ler_csv:
                 if coluna['id'] != str(id): # se o ID for diferente, adiciona a linha
                     reservas.append(coluna) 
+                else:
+                    removida = True
 
         with open(self.arquivo_reservas, mode='w', newline='') as file:
             ler_csv = csv.DictWriter(file, fieldnames=cabecalhos)
             ler_csv.writeheader()
             ler_csv.writerows(reservas)
+
+        return removida
 
     def removerPassageiro(self, cpf):
         """Remove um passageiro com base no CPF do arquivo CSV."""
@@ -362,8 +385,9 @@ class Menu:
     def cadastrar_passageiro(self):
         nome = input("Digite o nome do passageiro: ")
         cpf = input("Digite o CPF do passageiro: ")
+        telefone = input("Digite o telefone do passageiro: ")
 
-        passageiro = Passageiro(nome, cpf)
+        passageiro = Passageiro(nome, cpf, telefone)
         self.organizador.salvarPassageiro(passageiro)
         print(f"Passageiro {nome} cadastrado com sucesso.")
 
@@ -372,7 +396,7 @@ class Menu:
         if passageiros:
             print("\nPassageiros:")
             for passageiro in passageiros:
-                print(f"Nome: {passageiro['nome']}, CPF: {passageiro['cpf']}")
+                print(f"Nome: {passageiro['nome']}, CPF: {passageiro['cpf']}, Telefone: {passageiro['telefone']}")
         else:
             print("Nenhum passageiro cadastrado.")
 
