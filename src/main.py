@@ -264,21 +264,24 @@ class OrganizadorCSV:
         """Remove uma reserva com base no ID do arquivo CSV."""
         reservas = []
         removida = False
-        with open(self.arquivo_reservas, mode='r') as file:
-            ler_csv = csv.DictReader(file)
-            cabecalhos = ler_csv.fieldnames
-            for coluna in ler_csv:
-                if coluna['id'] != str(id): # se o ID for diferente, adiciona a linha
-                    reservas.append(coluna) 
-                else:
-                    removida = True
+        try:
+            with open(self.arquivo_reservas, mode='r') as file:
+                ler_csv = csv.DictReader(file)
+                cabecalhos = ler_csv.fieldnames
+                for coluna in ler_csv:
+                    if coluna['id'] != str(id): # se o ID for diferente, adiciona a linha
+                        reservas.append(coluna) 
+                    else:
+                        removida = True
 
-        with open(self.arquivo_reservas, mode='w', newline='') as file:
-            ler_csv = csv.DictWriter(file, fieldnames=cabecalhos)
-            ler_csv.writeheader()
-            ler_csv.writerows(reservas)
+            with open(self.arquivo_reservas, mode='w', newline='') as file:
+                ler_csv = csv.DictWriter(file, fieldnames=cabecalhos)
+                ler_csv.writeheader()
+                ler_csv.writerows(reservas)
 
-        return removida
+            return removida
+        except FileNotFoundError:
+            pass  
 
     def removerPassageiro(self, cpf):
         """Remove um passageiro com base no CPF do arquivo CSV."""
