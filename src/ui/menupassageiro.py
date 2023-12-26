@@ -16,7 +16,7 @@ class MenuPassageiro:
             print("2. Fazer uma reserva")
             print("3. Ver suas reservas")
             print("4. Cancelar uma reserva")
-            print("5. Sair")
+            print("5. Voltar ao menu principal")
 
             escolha = input("Escolha uma opção: ")
 
@@ -52,7 +52,7 @@ class MenuPassageiro:
             voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
             reserva = Reserva(passageiro_encontrado, voo)
             self.organizador.salvarReservaPassageiro(reserva)
-            print(f"Reserva para o voo {voo_codigo} cadastrada com sucesso.")
+            print(f"Reserva para o voo {voo_codigo} feita com sucesso.")
         elif not voo_info:
             print(f"Voo {voo_codigo} não encontrado.")
         else:
@@ -65,7 +65,7 @@ class MenuPassageiro:
             print("\nReservas:")
             for reserva in reservas:
                 if reserva['cpf'] == cpf:
-                    print(f"Codigo do voo: {reserva['voo']}, ID: {reserva['id']}")
+                    print(f"Código do voo: {reserva['voo']}, ID: {reserva['id']}")
         else:
             print(f"Você não possui reservas.")
 
