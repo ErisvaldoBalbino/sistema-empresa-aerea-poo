@@ -108,11 +108,11 @@ class MenuFuncionario:
             print("Nenhuma reserva cadastrada.")
 
     def remover_reserva(self):
-        id_reserva = input("Digite o ID da reserva a ser removida: ")
-        if self.organizador.removerReserva(id_reserva):
-            print(f"Reserva com ID {id_reserva} removida com sucesso.")
+        assento = input("Digite o ID da reserva a ser removida: ")
+        if self.organizador.removerReserva(assento):
+            print(f"Reserva para o assento {assento} removida com sucesso.")
         else:
-            print(f"Reserva com ID {id_reserva} não encontrada.")
+            print(f"Reserva para o assento {assento} não encontrada.")
 
     def salvar_voo(self):
         codigo = input("Digite o código do voo: ")
