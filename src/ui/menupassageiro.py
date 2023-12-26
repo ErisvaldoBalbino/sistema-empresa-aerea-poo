@@ -66,23 +66,10 @@ class MenuPassageiro:
             print("\nReservas:")
             for reserva in reservas:
                 if reserva['cpf'] == cpf:
-                    print(f"Código do voo: {reserva['voo']}, ID: {reserva['id']}")
+                    print(f"Código do voo: {reserva['voo']}, Assento: {reserva['assento']}")
         else:
             print(f"Você não possui reservas.")
 
     def cancelar_reserva(self):
-        # consertar erro de não cancelar reserva
-        cpf = self.cpf
-        reservas = self.organizador.carregarReservas()
-        if any(reserva['cpf'] == cpf for reserva in reservas):
-            id_reserva = input("Digite o ID da reserva: ")
-            for reserva in reservas.copy():
-                if reserva['cpf'] == cpf and reserva['id'] == id_reserva:
-                    reservas.remove(reserva)
-                    self.organizador.salvarReservas(reservas)
-                    print(f"Reserva {id_reserva} cancelada com sucesso.")
-                    break
-            else:
-                print(f"Reserva {id_reserva} não encontrada.")
-        else:
-            print(f"Você não possui reservas.")
+        pass
+        # refazer o método
