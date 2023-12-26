@@ -20,12 +20,18 @@ def main():
             menufuncionario = MenuFuncionario(organizador)
             menufuncionario.exibir_menu()
         elif escolha == '2':
+            passageiros = organizador.carregarPassageiros()
             nome = input("Digite seu nome: ")
             cpf = input("Digite seu CPF: ")
-            telefone = input("Digite seu telefone: ")
-            passageiro = Passageiro(nome, cpf, telefone)
-            organizador.salvarPassageiro(passageiro)
-            menupassageiro = MenuPassageiro(organizador, nome, cpf, telefone)
+            passageiro_encontrado = next((passageiro for passageiro in passageiros if passageiro['cpf'] == cpf), None)
+            if passageiro_encontrado:
+                print(f"Bem-vindo {passageiro_encontrado['nome']}!")
+                menupassageiro = MenuPassageiro(organizador, passageiro_encontrado['nome'], passageiro_encontrado['cpf'], passageiro_encontrado['telefone'])
+            else:
+                telefone = input("Digite seu telefone: ")
+                passageiro = Passageiro(nome, cpf, telefone)
+                organizador.salvarPassageiro(passageiro)
+                menupassageiro = MenuPassageiro(organizador, nome, cpf, telefone)
             menupassageiro.exibir_menu()
         elif escolha == '3':
             print("Obrigado por utilizar o sistema. Até logo!")
