@@ -4,7 +4,7 @@ class Reserva:
         passageiro (Passageiro): passageiro que fez a reserva
         voo (Voo): voo da reserva
         id (uuid): id da reserva, deve ser gerado automaticamente com a função uuid.uuid4() da biblioteca uuid"""
-    def __init__(self, passageiro, voo, id = None):
+    def __init__(self, passageiro, voo):
         self.__passageiro = passageiro
         self.__voo = voo
 
