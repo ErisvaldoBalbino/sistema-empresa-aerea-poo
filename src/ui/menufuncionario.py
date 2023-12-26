@@ -108,7 +108,7 @@ class MenuFuncionario:
             print("Nenhuma reserva cadastrada.")
 
     def remover_reserva(self):
-        assento = input("Digite o ID da reserva a ser removida: ")
+        assento = input("Digite o assento (ID) da reserva a ser removida: ")
         if self.organizador.removerReserva(assento):
             print(f"Reserva para o assento {assento} removida com sucesso.")
         else:
