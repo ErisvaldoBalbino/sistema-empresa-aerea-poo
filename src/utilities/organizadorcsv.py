@@ -29,7 +29,7 @@ class OrganizadorCSV:
         """Carrega informações de passageiros do arquivo CSV."""
         passageiros = []
         try:
-            with open(self.arquivo_passageiros, mode='r') as file:
+            with open(self.arquivo_passageiros, mode='r', encoding='utf-8') as file:
                 ler_csv = csv.DictReader(file)
                 for coluna in ler_csv:
                     passageiros.append({
@@ -98,7 +98,7 @@ class OrganizadorCSV:
     def removerPassageiro(self, cpf):
         """Remove um passageiro com base no CPF do arquivo CSV."""
         passageiros = []
-        with open(self.arquivo_passageiros, mode='r') as file:
+        with open(self.arquivo_passageiros, mode='r', encoding='utf-8') as file:
             ler_csv = csv.DictReader(file)
             cabecalhos = ler_csv.fieldnames
             for row in ler_csv:
@@ -133,7 +133,7 @@ class OrganizadorCSV:
         """Carrega informações de voos do arquivo CSV."""
         voos = []
         try:
-            with open(self.arquivo_voos, mode='r') as file:
+            with open(self.arquivo_voos, mode='r', encoding='utf-8') as file:
                 ler_csv = csv.DictReader(file)
                 for coluna in ler_csv:
                     voos.append({
