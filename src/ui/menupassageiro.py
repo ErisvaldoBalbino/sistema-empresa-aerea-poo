@@ -45,12 +45,13 @@ class MenuPassageiro:
     def fazer_reserva(self):
         cpf = self.cpf
         voo_codigo = input("Digite o código do voo: ")
+        assento = input("Digite o número do assento: ")
         voo_info = self.organizador.obterVooPorCodigo(voo_codigo)
         passageiros = self.organizador.carregarPassageiros()
         passageiro_encontrado = next((passageiro for passageiro in passageiros if passageiro['cpf'] == cpf), None)
         if passageiro_encontrado and voo_info:
             voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
-            reserva = Reserva(passageiro_encontrado, voo)
+            reserva = Reserva(passageiro_encontrado, voo, assento)
             self.organizador.salvarReservaPassageiro(reserva)
             print(f"Reserva para o voo {voo_codigo} feita com sucesso.")
         elif not voo_info:
