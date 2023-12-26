@@ -8,12 +8,6 @@ class OrganizadorCSV:
         self.arquivo_reservas = "reservas.csv"
         self.arquivo_voos = "voos.csv"
 
-    def proximo_id(self):
-        """Retorna o próximo ID de reserva e incrementa o contador."""
-        id_atual = self.contador_id
-        self.contador_id += 1
-        return id_atual
-
     def salvarPassageiro(self, passageiro):
         """Salva informações do passageiro em um arquivo CSV."""
         with open(self.arquivo_passageiros, mode='a', newline='', encoding='utf-8') as file:
@@ -41,10 +35,11 @@ class OrganizadorCSV:
             pass
         return passageiros
 
+    #verificar se o assento esta disponivel
     def salvarReservaPassageiro(self, reserva):
         """Salva informações da reserva em um arquivo CSV."""
         with open(self.arquivo_reservas, mode='a', newline='', encoding='utf-8') as file:
-            cabecalhos = ['cpf', 'voo', 'id']
+            cabecalhos = ['cpf', 'voo', 'assento']
             escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
 
             if file.tell() == 0:  # escreve o cabeçalho se o arquivo estiver vazio
@@ -53,7 +48,7 @@ class OrganizadorCSV:
             escrever_csv.writerow({
                 'cpf': reserva.get_passageiro()['cpf'], # agora pega o cpf pela chave nao pelo metodo
                 'voo': reserva.get_voo(),
-                'id': self.proximo_id()  # usa o id atual e incrementa o contador
+                'assento': reserva.get_assento()  # usa o id atual e incrementa o contador
             })
 
     def carregarReservas(self):
@@ -66,13 +61,13 @@ class OrganizadorCSV:
                     reservas.append({
                         'cpf': coluna['cpf'],
                         'voo': coluna['voo'],
-                        'id': int(coluna['id'])
+                        'assento': int(coluna['assento'])
                     })
         except FileNotFoundError:
             pass
         return reservas
 
-    def removerReserva(self, id):
+    def removerReserva(self, assento):
         """Remove uma reserva com base no ID do arquivo CSV."""
         reservas = []
         removida = False
@@ -81,7 +76,7 @@ class OrganizadorCSV:
                 ler_csv = csv.DictReader(file)
                 cabecalhos = ler_csv.fieldnames
                 for coluna in ler_csv:
-                    if coluna['id'] != str(id): # se o ID for diferente, adiciona a linha
+                    if coluna['assento'] != str(assento): # se o ID for diferente, adiciona a linha
                         reservas.append(coluna) 
                     else:
                         removida = True
