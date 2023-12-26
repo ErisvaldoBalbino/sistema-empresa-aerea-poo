@@ -1,8 +1,6 @@
 import csv
 
 class OrganizadorCSV:
-    contador_id = 0  # Inicializa o contador de ID
-
     def __init__(self):
         self.arquivo_passageiros = "passageiros.csv"
         self.arquivo_reservas = "reservas.csv"
@@ -48,7 +46,7 @@ class OrganizadorCSV:
             escrever_csv.writerow({
                 'cpf': reserva.get_passageiro()['cpf'], # agora pega o cpf pela chave nao pelo metodo
                 'voo': reserva.get_voo(),
-                'assento': reserva.get_assento()  # usa o id atual e incrementa o contador
+                'assento': reserva.get_assento()
             })
 
     def carregarReservas(self):
