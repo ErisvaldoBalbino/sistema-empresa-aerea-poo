@@ -3,7 +3,6 @@ class Pessoa:
     Atributos:
         nome (str): nome da pessoa
         cpf (str): CPF da pessoa
-        idade (int): idade da pessoa
         telefone (str): telefone da pessoa
         
     Métodos:
@@ -24,12 +23,11 @@ class Passageiro(Pessoa):
     Atributos:
         nome (str): nome do passageiro
         cpf (str): CPF do passageiro
+        telefone (str): telefone do passageiro
         reservas (list): lista de reservas do passageiro
         
     Métodos:
-        fazerReserva: faz uma reserva para o passageiro em um voo
-        cancelarReserva: cancela uma reserva do passageiro em um voo
-        visualizarReservas: retorna o número de reservas do passageiro"""
+        get_reservas: retorna a lista de reservas do passageiro"""
     def __init__(self, nome, cpf, telefone, reservas = None):
         super().__init__(nome, cpf, telefone)
         self.__reservas = reservas if reservas != None else []
