@@ -46,18 +46,32 @@ class MenuPassageiro:
         cpf = self.cpf
         voo_codigo = input("Digite o código do voo: ")
         assento = input("Digite o número do assento: ")
-        voo_info = self.organizador.obterVooPorCodigo(voo_codigo)
-        passageiros = self.organizador.carregarPassageiros()
-        passageiro_encontrado = next((passageiro for passageiro in passageiros if passageiro['cpf'] == cpf), None)
-        if passageiro_encontrado and voo_info:
-            voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
-            reserva = Reserva(passageiro_encontrado, voo, assento)
-            self.organizador.salvarReservaPassageiro(reserva)
-            print(f"Reserva para o voo {voo_codigo} feita com sucesso.")
-        elif not voo_info:
-            print(f"Voo {voo_codigo} não encontrado.")
+
+        # verifica se já tem reserva para o voo
+        reservas = self.organizador.carregarReservas()
+        reserva_existente = next((reserva for reserva in reservas if reserva['cpf'] == cpf and reserva['voo'] == voo_codigo), None)
+
+        # verifica se o assento esta ocupado
+        reserva_assento = next((reserva for reserva in reservas if reserva['voo'] == voo_codigo and str(reserva['assento']) == assento), None)
+
+        if reserva_existente:
+            print(f"Você já possui uma reserva para o voo {voo_codigo}.")
+        elif reserva_assento:
+            print(f"O assento {assento} já está ocupado.")
         else:
-            print(f"Não foi possível realizar a reserva.")
+            voo_info = self.organizador.obterVooPorCodigo(voo_codigo)
+            passageiros = self.organizador.carregarPassageiros()
+            passageiro_encontrado = next((passageiro for passageiro in passageiros if passageiro['cpf'] == cpf), None)
+
+            if passageiro_encontrado and voo_info:
+                voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
+                reserva = Reserva(passageiro_encontrado, voo, assento)
+                self.organizador.salvarReservaPassageiro(reserva)
+                print(f"Reserva para o voo {voo_codigo} feita com sucesso.")
+            elif not voo_info:
+                print(f"Voo {voo_codigo} não encontrado.")
+            else:
+                print(f"Não foi possível realizar a reserva.")
 
     def visualizar_reservas(self):
         cpf = self.cpf
@@ -71,5 +85,28 @@ class MenuPassageiro:
             print(f"Você não possui reservas.")
 
     def cancelar_reserva(self):
-        pass
-        # refazer o método
+        cpf = self.cpf
+        reservas = self.organizador.carregarReservas()
+
+        if any(reserva['cpf'] == cpf for reserva in reservas):
+            print("Suas reservas:")
+            for reserva in reservas:
+                if reserva['cpf'] == cpf:
+                    print(f"Código do voo: {reserva['voo']}, Assento: {reserva['assento']}")
+
+            voo_codigo = input("Digite o código do voo que deseja cancelar a reserva: ")
+            assento = input("Digite o número do assento que deseja cancelar: ")
+
+            reserva_igual = [reserva for reserva in reservas if reserva['cpf'] == cpf and reserva['voo'] == voo_codigo and str(reserva['assento']) == assento]
+
+            if reserva_igual:
+                # 
+                removido = self.organizador.removerReserva(reserva_igual[0]['assento'])
+                if removido:
+                    print(f"Reserva para o voo {voo_codigo}, assento {assento} cancelada com sucesso.")
+                else:
+                    print(f"Erro ao cancelar a reserva.")
+            else:
+                print(f"Reserva não encontrada para o voo {voo_codigo}, assento {assento}.")
+        else:
+            print("Você não possui reservas.")
