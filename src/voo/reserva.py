@@ -2,8 +2,7 @@ class Reserva:
     """Classe que representa uma reserva.
     Atributos:
         passageiro (Passageiro): passageiro que fez a reserva
-        voo (Voo): voo da reserva
-        id (uuid): id da reserva, deve ser gerado automaticamente com a função uuid.uuid4() da biblioteca uuid"""
+        voo (Voo): voo da reserva"""
     def __init__(self, passageiro, voo, assento):
         self.__passageiro = passageiro
         self.__voo = voo
