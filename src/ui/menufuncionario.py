@@ -80,6 +80,7 @@ class MenuFuncionario:
         self.listar_voos()
 
         voo_codigo = input("Digite o código do voo: ")
+        assento = input("Digite o assento (ID) da reserva: ")
         voo_info = self.organizador.obterVooPorCodigo(voo_codigo)
 
         passageiros = self.organizador.carregarPassageiros()
@@ -90,7 +91,7 @@ class MenuFuncionario:
         if passageiro_encontrado and voo_info:
             voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
 
-            reserva = Reserva(passageiro_encontrado, voo)
+            reserva = Reserva(passageiro_encontrado, voo, assento)
             self.organizador.salvarReservaPassageiro(reserva)
             print(f"Reserva para o voo {voo_codigo} cadastrada com sucesso.")
         elif not voo_info:
@@ -103,7 +104,7 @@ class MenuFuncionario:
         if reservas:
             print("\nReservas:")
             for reserva in reservas:
-                print(f"CPF: {reserva['cpf']}, Voo: {reserva['voo']}, ID: {reserva['id']}")
+                print(f"CPF: {reserva['cpf']}, Voo: {reserva['voo']}, Assento (ID): {reserva['assento']}")
         else:
             print("Nenhuma reserva cadastrada.")
 
