@@ -1,7 +1,7 @@
 from utilities.organizadorcsv import OrganizadorCSV
 from ui.menufuncionario import MenuFuncionario
 from ui.menupassageiro import MenuPassageiro
-from voo.passageiro import Passageiro
+from voo.pessoa import Passageiro
 
 def main():
     organizador = OrganizadorCSV()
@@ -24,7 +24,7 @@ def main():
             cpf = input("Digite seu CPF: ")
             passageiro_encontrado = next((passageiro for passageiro in passageiros if passageiro['cpf'] == cpf), None)
             if passageiro_encontrado:
-                print(f"Bem-vindo {passageiro_encontrado['nome']}!")
+                print(f"Bem-vindo novamente, {passageiro_encontrado['nome']}!")
                 menupassageiro = MenuPassageiro(organizador, passageiro_encontrado['nome'], passageiro_encontrado['cpf'], passageiro_encontrado['telefone'])
             else:
                 nome = input("Digite seu nome: ")
