@@ -1,5 +1,5 @@
 from voo.voo import Voo
-from voo.passageiro import Passageiro
+from voo.pessoa import Passageiro, Tripulante
 from voo.reserva import Reserva
 from utilities.organizadorcsv import OrganizadorCSV
 
@@ -10,14 +10,18 @@ class MenuFuncionario:
     def exibir_menu(self):
         while True:
             print("\n1. Cadastrar Passageiro")
-            print("2. Visualizar Passageiros")
+            print("2. Ver Passageiros")
             print("3. Cadastrar Reserva")
-            print("4. Visualizar Reservas")
+            print("4. Ver Reservas")
             print("5. Remover Reserva")
             print("6. Remover Passageiro")
             print("7. Salvar Voo")
             print("8. Listar Voos")
-            print("9. Voltar ao menu principal")
+            print("9. Cadastrar Tripulante")
+            print("10. Associar Tripulante a Voo")
+            print("11. Ver Tripulantes")
+            print("12. Remover Tripulante")
+            print("13. Sair")
 
             escolha = input("Escolha uma opção: ")
 
@@ -38,6 +42,14 @@ class MenuFuncionario:
             elif escolha == '8':
                 self.listar_voos()
             elif escolha == '9':
+                self.cadastrar_tripulante()
+            elif escolha == '10':
+                self.associar_tripulante_voo()
+            elif escolha == '11':
+                self.visualizar_tripulantes()
+            elif escolha == '12':
+                self.remover_tripulante()
+            elif escolha == '13':
                 print("Saindo...")
                 break
             else:
@@ -122,9 +134,8 @@ class MenuFuncionario:
         partida = input("Digite o aeroporto de partida: ")
         destino = input("Digite o aeroporto de destino: ")
         aviao = input("Digite o avião: ")
-        assentos = input("Digite o número de assentos: ")
 
-        voo = Voo(codigo, tipo, data, partida, destino, aviao, assentos)
+        voo = Voo(codigo, tipo, data, partida, destino, aviao)
         self.organizador.salvarVoo(voo)
         print(f"Voo {codigo} cadastrado com sucesso.")
 
@@ -133,6 +144,58 @@ class MenuFuncionario:
         if voos:
             print("\nVoos:")
             for voo in voos:
-                print(f"Código: {voo['codigo']}, Tipo: {voo['tipo']}, Data: {voo['data']}, Partida: {voo['partida']}, Destino: {voo['destino']}, Avião: {voo['aviao']}, Assentos: {voo['assentosTotais']}")
+                print(f"Código: {voo['codigo']}, Tipo: {voo['tipo']}, Data: {voo['data']}, Partida: {voo['partida']}, Destino: {voo['destino']}, Avião: {voo['aviao']}")
         else:
             print("Nenhum voo cadastrado.")
+
+    def cadastrar_tripulante(self):
+        nome = input("Digite o nome do tripulante: ")
+        cpf = input("Digite o CPF do tripulante: ")
+        funcao = input("Digite a funcao do tripulante: ")
+
+        tripulante = Tripulante(nome, cpf, funcao)
+        self.organizador.salvarTripulante(tripulante)
+        print(f"Tripulante {nome} cadastrado com sucesso.")
+
+    def associar_tripulante_voo(self):
+        cpf = input("Digite o CPF do tripulante: ")
+
+        self.listar_voos()
+
+        voo_codigo = input("Digite o código do voo: ")
+        voo_info = self.organizador.obterVooPorCodigo(voo_codigo)
+
+        tripulantes = self.organizador.carregarTripulantes()
+
+        # procura o tripulante na lista
+        tripulante_encontrado = next((tripulante for tripulante in tripulantes if tripulante['cpf'] == cpf), None)
+
+        if tripulante_encontrado and voo_info:
+            voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'])
+
+            tripulante = Tripulante(tripulante_encontrado['nome'], tripulante_encontrado['cpf'], tripulante_encontrado['funcao'], voo)
+            self.organizador.removerTripulante(cpf)
+            self.organizador.salvarTripulante(tripulante)
+            print(f"Tripulante {tripulante_encontrado['nome']} associado ao voo {voo_codigo} com sucesso.")
+        elif not voo_info:
+            print(f"Voo {voo_codigo} não encontrado.")
+        else:
+            print(f"Tripulante com CPF {cpf} não encontrado.")
+
+    def visualizar_tripulantes(self):
+        tripulantes = self.organizador.carregarTripulantes()
+        if tripulantes:
+            print("\nTripulantes:")
+            for tripulante in tripulantes:
+                print(f"Nome: {tripulante['nome']}, CPF: {tripulante['cpf']}, Função: {tripulante['funcao']}, Voo: {tripulante['voo']['codigo'] if tripulante['voo'] else ''}")
+        else:
+            print("Nenhum tripulante cadastrado.")
+
+    def remover_tripulante(self):
+        cpf = input("Digite o CPF do tripulante a ser removido: ")
+        tripulantes = self.organizador.carregarTripulantes()
+        if any(tripulante['cpf'] == cpf for tripulante in tripulantes):
+            self.organizador.removerTripulante(cpf)
+            print(f"Tripulante com CPF {cpf} removido com sucesso.")
+        else:
+            print(f"Tripulante com CPF {cpf} não encontrado.")
