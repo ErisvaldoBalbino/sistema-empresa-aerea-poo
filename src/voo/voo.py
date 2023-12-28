@@ -16,25 +16,18 @@ class Voo:
         str: retorna uma string com os atributos do voo
         
     Quando for instanciada, é recomendado que seus parametros sejam instancias das outras classes."""
-    def __init__(self, codigoVoo, tipoVoo, data, partida, destino, aviao, assentosTotais, tripulacao = None, reservas = None):
+    def __init__(self, codigoVoo, tipoVoo, data, partida, destino, aviao, tripulacao = None, reservas = None):
         self.__codigoVoo = codigoVoo
         self.__tipoVoo = tipoVoo
         self.__data = data
         self.__partida = partida
         self.__destino = destino
         self.__aviao = aviao
-        self.__assentosTotais = assentosTotais
         self.reservas = reservas if reservas != None else []
         self.__tripulacao = tripulacao if tripulacao != None else []
-
-    def assentosLivres(self):
-        return self.__assentosTotais - len(self.reservas)
     
     def get_aviao(self):
         return self.__aviao
-    
-    def get_assentos(self):
-        return self.__assentosTotais
     
     def get_codigoVoo(self):
         return self.__codigoVoo
@@ -58,4 +51,4 @@ class Voo:
         return self.__destino
 
     def __str__(self):
-        return f"Voo: {self.__codigoVoo}\nTipo: {self.__tipoVoo}\nData: {self.__data}\nPartida: {self.__partida}\nDestino: {self.__destino}\nAvião: {self.__aviao}\nAssentos Totais: {self.__assentosTotais}\nAssentos Livres: {self.assentosLivres()}"        
+        return f"Voo: {self.__codigoVoo}\nTipo: {self.__tipoVoo}\nData: {self.__data}\nPartida: {self.__partida}\nDestino: {self.__destino}\nAvião: {self.__aviao}"
