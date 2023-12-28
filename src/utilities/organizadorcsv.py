@@ -1,6 +1,16 @@
 import csv
+from abc import ABC, abstractmethod
 
-class OrganizadorCSV:
+class InterfaceCSV(ABC):
+    @abstractmethod
+    def lerCsv(self, arquivo):
+        pass
+
+    @abstractmethod
+    def escreverCsv(self, arquivo, dados, cabecalhos, modo='a'):
+        pass
+
+class OrganizadorCSV(InterfaceCSV):
     """Classe para organizar as informações em arquivos CSV.
     Atributos:
         arquivo_passageiros (str): nome do arquivo CSV de passageiros
@@ -15,68 +25,53 @@ class OrganizadorCSV:
         self.arquivo_voos = "voos.csv"
         self.arquivo_tripulantes = "tripulantes.csv"
 
+    def lerCsv(self, arquivo):
+        """Lê um arquivo CSV e retorna uma lista de dicionários com as informações do CSV."""
+        with open(arquivo, mode='r', encoding='utf-8') as file:
+            ler_csv = csv.DictReader(file)
+            dados = []
+            for coluna in ler_csv:
+                dados.append(coluna)
+        return dados
+    
+    def escreverCsv(self, arquivo, dados, cabecalhos, modo='a'):
+        """Escreve em um arquivo CSV.
+            Recebe o nome do arquivo, os dados a serem escritos, os cabeçalhos e o modo de escrita.
+            O modo de escrita padrão é 'a' (append)."""
+        with open(arquivo, mode=modo, newline='', encoding='utf-8') as file:
+            escreverCsv = csv.DictWriter(file, fieldnames=cabecalhos)
+
+            if file.tell() == 0:
+                escreverCsv.writeheader()
+
+            escreverCsv.writerow(dados)
+
     def salvarPassageiro(self, passageiro):
         """Salva informações do passageiro em um arquivo CSV.
-            Recebe um objeto de Passageiro como parâmetro."""
-        with open(self.arquivo_passageiros, mode='a', newline='', encoding='utf-8') as file:
-            cabecalhos = ['nome', 'cpf', 'telefone']
-            escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
-
-            if file.tell() == 0:  # escreve o cabeçalho se o arquivo estiver vazio
-                escrever_csv.writeheader()
-
-            escrever_csv.writerow({'nome': passageiro.nome, 'cpf': passageiro.get_cpf(), 'telefone': passageiro.telefone})
+           Recebe um objeto de Passageiro como parâmetro."""
+        cabecalhos = ['nome', 'cpf', 'telefone']
+        dados = {'nome': passageiro.nome, 'cpf': passageiro.get_cpf(), 'telefone': passageiro.telefone}
+        
+        self.escreverCsv(self.arquivo_passageiros, dados, cabecalhos, modo='a')
 
     def carregarPassageiros(self):
         """Carrega informações de passageiros do arquivo CSV.
             Retorna uma lista de dicionários com as informações do csv."""
-        passageiros = []
-        try:
-            with open(self.arquivo_passageiros, mode='r', encoding='utf-8') as file:
-                ler_csv = csv.DictReader(file)
-                for coluna in ler_csv:
-                    passageiros.append({
-                        'nome': coluna['nome'],
-                        'cpf': coluna['cpf'],
-                        'telefone': coluna['telefone']
-                    })
-        except FileNotFoundError:
-            pass
-        return passageiros
+        return self.lerCsv(self.arquivo_passageiros)
 
     def salvarReservaPassageiro(self, reserva):
         """Salva informações da reserva em um arquivo CSV.
             Recebe um objeto de Reserva como parâmetro.
             As verificações para o assento e voo devem ser feitas no menu."""
-        with open(self.arquivo_reservas, mode='a', newline='', encoding='utf-8') as file:
-            cabecalhos = ['cpf', 'voo', 'assento']
-            escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
-
-            if file.tell() == 0:  # escreve o cabeçalho se o arquivo estiver vazio
-                escrever_csv.writeheader()
-
-            escrever_csv.writerow({
-                'cpf': reserva.get_passageiro()['cpf'], # agora pega o cpf pela chave nao pelo metodo
-                'voo': reserva.get_voo(),
-                'assento': reserva.get_assento()
-            })
+        cabecalhos = ['cpf', 'voo', 'assento']
+        dados = {'cpf': reserva.get_passageiro()['cpf'], 'voo': reserva.get_voo(), 'assento': reserva.get_assento()}
+        
+        self.escreverCsv(self.arquivo_reservas, dados, cabecalhos, modo='a')
 
     def carregarReservas(self):
         """Carrega informações de reservas do arquivo CSV.
             Retorna uma lista de dicionários com as informações do csv."""
-        reservas = []
-        try:
-            with open(self.arquivo_reservas, mode='r', encoding='utf-8') as file:
-                ler_csv = csv.DictReader(file)
-                for coluna in ler_csv:
-                    reservas.append({
-                        'cpf': coluna['cpf'],
-                        'voo': coluna['voo'],
-                        'assento': int(coluna['assento'])
-                    })
-        except FileNotFoundError:
-            pass
-        return reservas
+        return self.lerCsv(self.arquivo_reservas)
 
     def removerReserva(self, assento):
         """Remove uma reserva com base no ID (assento) do arquivo CSV.
@@ -123,41 +118,18 @@ class OrganizadorCSV:
     def salvarVoo(self, voo):
         """Salva informações do voo em um arquivo CSV.
             Recebe um objeto de Voo como parâmetro."""
-        with open(self.arquivo_voos, mode='a', newline='', encoding='utf-8') as file:
-            cabecalhos = ['codigo', 'tipo', 'data', 'partida', 'destino', 'aviao']
-            escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
-
-            if file.tell() == 0:
-                escrever_csv.writeheader()
-
-            escrever_csv.writerow({
-                'codigo': voo.get_codigoVoo(),
-                'tipo': voo.get_tipoVoo(),
-                'data': voo.get_data(),
-                'partida': voo.get_partida(),
-                'destino': voo.get_destino(),
-                'aviao': voo.get_aviao()
-            })
+        cabecalhos = ['codigo', 'tipo', 'data', 'partida', 'destino', 'aviao']
+        dados = {'codigo': voo.get_codigoVoo(), 'tipo': voo.get_tipoVoo(), 'data': voo.get_dataVoo(), 'partida': voo.get_partida(), 'destino': voo.get_destino(), 'aviao': voo.get_aviao()}
+        
+        self.escreverCsv(self.arquivo_voos, dados, cabecalhos, modo='a')
     
     def carregarVoos(self):
         """Carrega informações de voos do arquivo CSV.
             Retorna uma lista de dicionários com as informações do csv."""
-        voos = []
         try:
-            with open(self.arquivo_voos, mode='r', encoding='utf-8') as file:
-                ler_csv = csv.DictReader(file)
-                for coluna in ler_csv:
-                    voos.append({
-                        'codigo': coluna['codigo'],
-                        'tipo': coluna['tipo'],
-                        'data': coluna['data'],
-                        'partida': coluna['partida'],
-                        'destino': coluna['destino'],
-                        'aviao': coluna['aviao']
-                    })
+            return self.lerCsv(self.arquivo_voos)
         except FileNotFoundError:
-            pass
-        return voos
+            return "O arquivo não existe."
     
     def obterVooPorCodigo(self, codigo):
         """Carrega informações de um voo específico do arquivo CSV.
@@ -171,19 +143,10 @@ class OrganizadorCSV:
     def salvarTripulante(self, tripulante):
         """Salva informações do tripulante em um arquivo CSV.
             Recebe um objeto de Tripulante como parâmetro."""
-        with open(self.arquivo_tripulantes, mode='a', newline='', encoding='utf-8') as file:
-            cabecalhos = ['nome', 'cpf', 'funcao', 'voo_codigo']
-            escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
-
-            if file.tell() == 0:
-                escrever_csv.writeheader()
-
-            escrever_csv.writerow({
-                'nome': tripulante.nome,
-                'cpf': tripulante.get_cpf(),
-                'funcao': tripulante.get_funcao(),
-                'voo_codigo': tripulante.voo.get_codigoVoo() if tripulante.voo else ''
-            })
+        cabecalhos = ['nome', 'cpf', 'funcao', 'voo_codigo']
+        dados = {'nome': tripulante.nome, 'cpf': tripulante.get_cpf(), 'funcao': tripulante.get_funcao(), 'voo_codigo': tripulante.voo}
+        
+        self.escreverCsv(self.arquivo_tripulantes, dados, cabecalhos, modo='a')
 
     def carregarTripulantes(self):
         """Carrega informações de tripulantes do arquivo CSV.
