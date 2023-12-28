@@ -1,5 +1,5 @@
 from voo.voo import Voo
-from voo.passageiro import Passageiro
+from voo.pessoa import Passageiro
 from voo.reserva import Reserva
 from utilities.organizadorcsv import OrganizadorCSV
 
@@ -29,6 +29,7 @@ class MenuPassageiro:
             elif escolha == '4':
                 self.cancelar_reserva()
             elif escolha == '5':
+                print("Saindo...")
                 break
             else:
                 print("Opção inválida. Tente novamente.")
@@ -38,7 +39,7 @@ class MenuPassageiro:
         if voos:
             print("\nVoos disponíveis:")
             for voo in voos:
-                print(f"Código: {voo['codigo']}, Tipo: {voo['tipo']}, Data: {voo['data']}, Partida: {voo['partida']}, Destino: {voo['destino']}, Avião: {voo['aviao']}, Assentos: {voo['assentosTotais']}")
+                print(f"Código: {voo['codigo']}, Tipo: {voo['tipo']}, Data: {voo['data']}, Partida: {voo['partida']}, Destino: {voo['destino']}, Avião: {voo['aviao']}")
         else:
             print(f"Não há voos disponíveis.")
 
@@ -64,7 +65,7 @@ class MenuPassageiro:
             passageiro_encontrado = next((passageiro for passageiro in passageiros if passageiro['cpf'] == cpf), None)
 
             if passageiro_encontrado and voo_info:
-                voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
+                voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'])
                 reserva = Reserva(passageiro_encontrado, voo, assento)
                 self.organizador.salvarReservaPassageiro(reserva)
                 print(f"Reserva para o voo {voo_codigo} feita com sucesso.")
