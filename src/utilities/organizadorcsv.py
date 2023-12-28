@@ -122,7 +122,7 @@ class OrganizadorCSV(InterfaceCSV):
         """Salva informações do voo em um arquivo CSV.
             Recebe um objeto de Voo como parâmetro."""
         cabecalhos = ['codigo', 'tipo', 'data', 'partida', 'destino', 'aviao']
-        dados = {'codigo': voo.get_codigoVoo(), 'tipo': voo.get_tipoVoo(), 'data': voo.get_dataVoo(), 'partida': voo.get_partida(), 'destino': voo.get_destino(), 'aviao': voo.get_aviao()}
+        dados = {'codigo': voo.get_codigoVoo(), 'tipo': voo.get_tipoVoo(), 'data': voo.get_data(), 'partida': voo.get_partida(), 'destino': voo.get_destino(), 'aviao': voo.get_aviao()}
         
         self.escreverCsv(self.arquivo_voos, dados, cabecalhos, modo='a')
     
@@ -151,7 +151,7 @@ class OrganizadorCSV(InterfaceCSV):
     def carregarTripulantes(self):
         """Carrega informações de tripulantes do arquivo CSV.
             Retorna uma lista de dicionários com as informações do csv."""
-        self.lerCsv(self.arquivo_tripulantes)
+        return self.lerCsv(self.arquivo_tripulantes)
 
     def removerTripulante(self, cpf):
         """Remove um tripulante com base no CPF do arquivo CSV.
