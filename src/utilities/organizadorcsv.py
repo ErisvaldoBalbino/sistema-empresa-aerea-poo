@@ -27,11 +27,14 @@ class OrganizadorCSV(InterfaceCSV):
 
     def lerCsv(self, arquivo):
         """Lê um arquivo CSV e retorna uma lista de dicionários com as informações do CSV."""
-        with open(arquivo, mode='r', encoding='utf-8') as file:
-            ler_csv = csv.DictReader(file)
-            dados = []
-            for coluna in ler_csv:
-                dados.append(coluna)
+        dados = []
+        try:
+            with open(arquivo, mode='r', encoding='utf-8') as file:
+                ler_csv = csv.DictReader(file)
+                for coluna in ler_csv:
+                    dados.append(coluna)
+        except FileNotFoundError:
+            pass
         return dados
     
     def escreverCsv(self, arquivo, dados, cabecalhos, modo='a'):
@@ -126,10 +129,7 @@ class OrganizadorCSV(InterfaceCSV):
     def carregarVoos(self):
         """Carrega informações de voos do arquivo CSV.
             Retorna uma lista de dicionários com as informações do csv."""
-        try:
-            return self.lerCsv(self.arquivo_voos)
-        except FileNotFoundError:
-            return "O arquivo não existe."
+        return self.lerCsv(self.arquivo_voos)
     
     def obterVooPorCodigo(self, codigo):
         """Carrega informações de um voo específico do arquivo CSV.
@@ -151,23 +151,7 @@ class OrganizadorCSV(InterfaceCSV):
     def carregarTripulantes(self):
         """Carrega informações de tripulantes do arquivo CSV.
             Retorna uma lista de dicionários com as informações do csv."""
-        tripulantes = []
-        try:
-            with open(self.arquivo_tripulantes, mode='r', encoding='utf-8') as file:
-                ler_csv = csv.DictReader(file)
-                for coluna in ler_csv:
-                    voo_codigo = coluna['voo_codigo']
-                    voo = self.obterVooPorCodigo(voo_codigo) if voo_codigo else None
-
-                    tripulantes.append({
-                        'nome': coluna['nome'],
-                        'cpf': coluna['cpf'],
-                        'funcao': coluna['funcao'],
-                        'voo': voo
-                    })
-        except FileNotFoundError:
-            pass
-        return tripulantes
+        self.lerCsv(self.arquivo_tripulantes)
 
     def removerTripulante(self, cpf):
         """Remove um tripulante com base no CPF do arquivo CSV.
