@@ -13,6 +13,7 @@ class OrganizadorCSV:
         self.arquivo_passageiros = "passageiros.csv"
         self.arquivo_reservas = "reservas.csv"
         self.arquivo_voos = "voos.csv"
+        self.arquivo_tripulantes = "tripulantes.csv"
 
     def salvarPassageiro(self, passageiro):
         """Salva informações do passageiro em um arquivo CSV.
@@ -123,7 +124,7 @@ class OrganizadorCSV:
         """Salva informações do voo em um arquivo CSV.
             Recebe um objeto de Voo como parâmetro."""
         with open(self.arquivo_voos, mode='a', newline='', encoding='utf-8') as file:
-            cabecalhos = ['codigo', 'tipo', 'data', 'partida', 'destino', 'aviao', 'assentosTotais']
+            cabecalhos = ['codigo', 'tipo', 'data', 'partida', 'destino', 'aviao']
             escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
 
             if file.tell() == 0:
@@ -135,8 +136,7 @@ class OrganizadorCSV:
                 'data': voo.get_data(),
                 'partida': voo.get_partida(),
                 'destino': voo.get_destino(),
-                'aviao': voo.get_aviao(),
-                'assentosTotais': voo.get_assentos()
+                'aviao': voo.get_aviao()
             })
     
     def carregarVoos(self):
@@ -153,8 +153,7 @@ class OrganizadorCSV:
                         'data': coluna['data'],
                         'partida': coluna['partida'],
                         'destino': coluna['destino'],
-                        'aviao': coluna['aviao'],
-                        'assentosTotais': coluna['assentosTotais']
+                        'aviao': coluna['aviao']
                     })
         except FileNotFoundError:
             pass
@@ -168,3 +167,57 @@ class OrganizadorCSV:
             if voo['codigo'] == codigo:
                 return voo
         return None
+    
+    def salvarTripulante(self, tripulante):
+        """Salva informações do tripulante em um arquivo CSV.
+            Recebe um objeto de Tripulante como parâmetro."""
+        with open(self.arquivo_tripulantes, mode='a', newline='', encoding='utf-8') as file:
+            cabecalhos = ['nome', 'cpf', 'funcao', 'voo_codigo']
+            escrever_csv = csv.DictWriter(file, fieldnames=cabecalhos)
+
+            if file.tell() == 0:
+                escrever_csv.writeheader()
+
+            escrever_csv.writerow({
+                'nome': tripulante.nome,
+                'cpf': tripulante.get_cpf(),
+                'funcao': tripulante.get_funcao(),
+                'voo_codigo': tripulante.voo.get_codigoVoo() if tripulante.voo else ''
+            })
+
+    def carregarTripulantes(self):
+        """Carrega informações de tripulantes do arquivo CSV.
+            Retorna uma lista de dicionários com as informações do csv."""
+        tripulantes = []
+        try:
+            with open(self.arquivo_tripulantes, mode='r', encoding='utf-8') as file:
+                ler_csv = csv.DictReader(file)
+                for coluna in ler_csv:
+                    voo_codigo = coluna['voo_codigo']
+                    voo = self.obterVooPorCodigo(voo_codigo) if voo_codigo else None
+
+                    tripulantes.append({
+                        'nome': coluna['nome'],
+                        'cpf': coluna['cpf'],
+                        'funcao': coluna['funcao'],
+                        'voo': voo
+                    })
+        except FileNotFoundError:
+            pass
+        return tripulantes
+
+    def removerTripulante(self, cpf):
+        """Remove um tripulante com base no CPF do arquivo CSV.
+            Não possui retorno, apenas remove o tripulante do arquivo CSV."""
+        tripulantes = []
+        with open(self.arquivo_tripulantes, mode='r', encoding='utf-8') as file:
+            ler_csv = csv.DictReader(file)
+            cabecalhos = ler_csv.fieldnames
+            for row in ler_csv:
+                if row['cpf'] != cpf:
+                    tripulantes.append(row)
+
+        with open(self.arquivo_tripulantes, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=cabecalhos)
+            writer.writeheader()
+            writer.writerows(tripulantes)
