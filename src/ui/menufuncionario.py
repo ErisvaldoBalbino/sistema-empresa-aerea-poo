@@ -171,9 +171,9 @@ class MenuFuncionario:
         tripulante_encontrado = next((tripulante for tripulante in tripulantes if tripulante['cpf'] == cpf), None)
 
         if tripulante_encontrado and voo_info:
-            voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'])
+            Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'])
 
-            tripulante = Tripulante(tripulante_encontrado['nome'], tripulante_encontrado['cpf'], tripulante_encontrado['funcao'], voo)
+            tripulante = Tripulante(tripulante_encontrado['nome'], tripulante_encontrado['cpf'], tripulante_encontrado['funcao'], voo_codigo)
             self.organizador.removerTripulante(cpf)
             self.organizador.salvarTripulante(tripulante)
             print(f"Tripulante {tripulante_encontrado['nome']} associado ao voo {voo_codigo} com sucesso.")
@@ -187,7 +187,8 @@ class MenuFuncionario:
         if tripulantes:
             print("\nTripulantes:")
             for tripulante in tripulantes:
-                print(f"Nome: {tripulante['nome']}, CPF: {tripulante['cpf']}, Função: {tripulante['funcao']}, Voo: {tripulante['voo']['codigo'] if tripulante['voo'] else ''}")
+                voo_codigo = tripulante['voo']['codigo'] if 'voo' in tripulante and 'codigo' in tripulante['voo'] else ''
+                print(f"Nome: {tripulante['nome']}, CPF: {tripulante['cpf']}, Função: {tripulante['funcao']}, Voo: {voo_codigo}")
         else:
             print("Nenhum tripulante cadastrado.")
 
