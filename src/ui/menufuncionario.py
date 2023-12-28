@@ -101,7 +101,7 @@ class MenuFuncionario:
         passageiro_encontrado = next((passageiro for passageiro in passageiros if passageiro['cpf'] == cpf), None)
 
         if passageiro_encontrado and voo_info:
-            voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'], voo_info['assentosTotais'])
+            voo = Voo(voo_info['codigo'], voo_info['tipo'], voo_info['data'], voo_info['partida'], voo_info['destino'], voo_info['aviao'])
 
             reserva = Reserva(passageiro_encontrado, voo, assento)
             self.organizador.salvarReservaPassageiro(reserva)
