@@ -33,7 +33,6 @@ cd sistema-empresa-aerea-poo
 ```
 
 ### **2. Crie um ambiente virtual**
-*O sistema não possui nenhuma dependência, então se preferir pode pular esse passo.*
 
 Para criar o ambiente virtual se certifique de estar na pasta do sistema e executar esses comandos:
 ```
