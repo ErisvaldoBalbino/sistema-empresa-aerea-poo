@@ -21,7 +21,7 @@ class MenuFuncionario:
             print("10. Associar Tripulante a Voo")
             print("11. Ver Tripulantes")
             print("12. Remover Tripulante")
-            print("13. Sair")
+            print("13. Voltar ao menu principal")
 
             escolha = input("Escolha uma opção: ")
 
